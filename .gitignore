@@ -1,0 +1,40 @@
+# Unity generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+
+# Asset store tools and package cache
+/[Aa]ssets/AssetStoreTools*
+/[Pp]ackages/*
+!/[Pp]ackages/manifest.json
+!/[Pp]ackages/packages-lock.json
+
+# Visual Studio / VS Code / Rider project files
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vs/
+.idea/
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db
