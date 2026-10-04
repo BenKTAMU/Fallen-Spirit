@@ -13,11 +13,13 @@ public class PlayerController : MonoBehaviour
     private float holdTimer;
     [SerializeField] private float maxHoldTime = 0.8f;
     [SerializeField] private float jumpForce = 4f;
-    
+
+    private bool isGrounded = true;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     void Awake()
@@ -29,8 +31,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        Debug.Log(isGrounded);
         body.linearVelocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, body.linearVelocity.y);
 
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -39,14 +39,24 @@ public class PlayerController : MonoBehaviour
             holdTimer = 0f;
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
         }
-        
+
 
         if (Input.GetButtonUp("Jump") && body.linearVelocity.y > 0)
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, body.linearVelocity.y * 0.5f);
             isJumping = false;
         }
-        
-        
+
+
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "ground") isGrounded = true;
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "ground") isGrounded = false;
     }
 }
