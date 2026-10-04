@@ -193,9 +193,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!61 &335392497
 BoxCollider2D:
@@ -336,8 +336,9 @@ MonoBehaviour:
     m_Bits: 8
   groundCheck: {fileID: 190482822}
   checkRadius: 0.1
-  maxHoldTime: 0.5
   jumpForce: 8
+  fallMultiplier: 1.2
+  lowJumpMultiplier: 2
 --- !u!1 &418248600
 GameObject:
   m_ObjectHideFlags: 0
@@ -931,7 +932,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   player: {fileID: 335392499}
-  offset: {x: 0, y: 4, z: 0}
+  offset: {x: 0, y: 0, z: 0}
   smoothSpeed: 0.125
 --- !u!1 &576536804
 GameObject:

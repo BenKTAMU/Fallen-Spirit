@@ -13,8 +13,14 @@ public class follow_player : MonoBehaviour
 
     }
 
+    void Awake()
+    {
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 120;
+    }
+
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         if (player != null)
         {

@@ -9,10 +9,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float checkRadius = 0.5f;
     private Rigidbody2D body;
 
-    private bool isJumping;
-    private float holdTimer;
-    [SerializeField] private float maxHoldTime = 0.8f;
     [SerializeField] private float jumpForce = 4f;
+    [SerializeField] private float fallMultiplier = 2.5f;
+    [SerializeField] private float lowJumpMultiplier = 2f;
 
     private bool isGrounded = true;
 
@@ -33,21 +32,20 @@ public class PlayerController : MonoBehaviour
     {
         body.linearVelocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, body.linearVelocity.y);
 
+        if (body.linearVelocityY < 0)
+        {
+            body.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+        }
+        else if (body.linearVelocityY > 0 && !Input.GetButton("Jump"))
+        {
+            body.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+        }
+        
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            isJumping = true;
-            holdTimer = 0f;
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
         }
-
-
-        if (Input.GetButtonUp("Jump") && body.linearVelocity.y > 0)
-        {
-            body.linearVelocity = new Vector2(body.linearVelocity.x, body.linearVelocity.y * 0.5f);
-            isJumping = false;
-        }
-
-
+        
     }
 
     void OnCollisionEnter2D(Collision2D collision)
