@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void Die()
+    {
+        Debug.Log("Game Over");
+    }
+
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -44,7 +49,7 @@ public class PlayerController : MonoBehaviour
         {
             body.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
-        
+
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
@@ -55,7 +60,7 @@ public class PlayerController : MonoBehaviour
             body.linearVelocity = Vector2.down * Physics2D.gravity.y * (groundPoundForce);
             isGroundPounding = true;
         }
-        
+
     }
 
     void OnCollisionEnter2D(Collision2D collision)
