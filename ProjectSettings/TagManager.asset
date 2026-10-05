@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - ground
+  - boots
+  - armor
+  - helmet
   layers:
   - Default
   - TransparentFX

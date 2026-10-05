@@ -12,8 +12,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
+    [SerializeField] private float groundPoundForce = 2f;
+
+    public PowerUps powerUps;
 
     private bool isGrounded = true;
+    public bool isGroundPounding = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -45,12 +49,22 @@ public class PlayerController : MonoBehaviour
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
         }
+
+        if (Input.GetKeyDown(KeyCode.S) && powerUps.hasBoots)
+        {
+            body.linearVelocity = Vector2.down * Physics2D.gravity.y * (groundPoundForce);
+            isGroundPounding = true;
+        }
         
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "ground") isGrounded = true;
+        if (collision.gameObject.tag == "ground")
+        {
+            isGrounded = true;
+            isGroundPounding = false;
+        }
     }
 
     void OnCollisionExit2D(Collision2D collision)

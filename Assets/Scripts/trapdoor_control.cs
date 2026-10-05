@@ -5,6 +5,7 @@ public class trapdoor_control : MonoBehaviour
     private bool isOnTrapdoor;
 
     public Collider2D player;
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
