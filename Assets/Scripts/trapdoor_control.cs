@@ -5,6 +5,8 @@ public class trapdoor_control : MonoBehaviour
     private bool isOnTrapdoor;
 
     public Collider2D player;
+
+    public PlayerController playerController;
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -16,7 +18,7 @@ public class trapdoor_control : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isOnTrapdoor && (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)))
+        if (isOnTrapdoor && (playerController.isGroundPounding))
         {
             gameObject.SetActive(false);
         }

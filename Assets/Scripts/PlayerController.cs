@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -55,7 +56,7 @@ public class PlayerController : MonoBehaviour
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
         }
 
-        if (Input.GetKeyDown(KeyCode.S) && powerUps.hasBoots)
+        if (Input.GetKeyDown(KeyCode.S) && powerUps.hasBoots && !isGrounded)
         {
             body.linearVelocity = Vector2.down * Physics2D.gravity.y * (groundPoundForce);
             isGroundPounding = true;
@@ -68,12 +69,18 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "ground")
         {
             isGrounded = true;
-            isGroundPounding = false;
+            StartCoroutine(StopGroundPounding());
         }
     }
 
     void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "ground") isGrounded = false;
+    }
+
+    IEnumerator StopGroundPounding()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isGroundPounding = false;
     }
 }
