@@ -34,7 +34,6 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        Debug.Log("Awake");
     }
 
     // Update is called once per frame
