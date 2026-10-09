@@ -9,21 +9,28 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float checkRadius = 0.5f;
     private Rigidbody2D body;
+    
 
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
     [SerializeField] private float groundPoundForce = 2f;
 
+    public GameObject forceField;
+
     public PowerUps powerUps;
 
     private bool isGrounded = true;
     public bool isGroundPounding = false;
 
+    private int playerLayer;
+    private int playerShieldedLayer;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        playerLayer = LayerMask.NameToLayer("Player");
+        playerShieldedLayer = LayerMask.NameToLayer("PlayerShielded");
     }
 
     public void Die()
@@ -60,6 +67,20 @@ public class PlayerController : MonoBehaviour
             body.linearVelocity = Vector2.down * Physics2D.gravity.y * (groundPoundForce);
             isGroundPounding = true;
         }
+
+        if (Input.GetMouseButtonDown(0) && powerUps.hasArmor)
+        {
+            gameObject.layer = playerShieldedLayer;
+            forceField.SetActive(true);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            gameObject.layer = playerLayer;
+            forceField.SetActive(false);
+        }
+
+
 
     }
 
