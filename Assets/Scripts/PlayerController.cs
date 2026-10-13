@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using System.Collections;
@@ -15,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
     [SerializeField] private float groundPoundForce = 2f;
+    
+    [SerializeField] private GameObject respawnPoint;
 
     public GameObject forceField;
 
@@ -36,6 +39,7 @@ public class PlayerController : MonoBehaviour
     public void Die()
     {
         Debug.Log("Game Over");
+        transform.position = respawnPoint.transform.position;
     }
 
     void Awake()
@@ -84,19 +88,32 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    private void FixedUpdate()
     {
-        if (collision.gameObject.tag == "ground")
-        {
-            isGrounded = true;
-            StartCoroutine(StopGroundPounding());
-        }
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "ground") isGrounded = false;
+        if (collision.gameObject.tag == "ground" && isGroundPounding)
+        {
+            StartCoroutine(StopGroundPounding());
+        }
+        if(collision.gameObject.tag == "fireball"){
+            Die();
+        }
+
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "checkpoint")
+        {
+            Debug.Log("Checkpoint reached");
+            respawnPoint = other.gameObject;
+        }
+    }
+    
 
     IEnumerator StopGroundPounding()
     {
