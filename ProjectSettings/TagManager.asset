@@ -10,6 +10,8 @@ TagManager:
   - helmet
   - forcefield
   - enemy
+  - fireball
+  - checkpoint
   layers:
   - Default
   - TransparentFX
