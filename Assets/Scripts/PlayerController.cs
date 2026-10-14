@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float checkRadius = 0.5f;
     private Rigidbody2D body;
-    
+
 
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
@@ -90,6 +90,29 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
             StartCoroutine(StopGroundPounding());
+        }
+        else if (collision.gameObject.tag == "enemy")
+        {
+            bool on_top = false;
+
+            foreach (ContactPoint2D point in collision.contacts)
+            {
+                if (Vector2.Dot(Vector2.up, point.normal) > 0.4f)
+                {
+                    on_top = true;
+                    break;
+                }
+            }
+
+            if (on_top && isGroundPounding)
+            {
+                Debug.Log("Pounded enemy");
+                isGrounded = true;
+            }
+            else
+            {
+                Debug.Log("Game Over (touched enemy)");
+            }
         }
     }
 

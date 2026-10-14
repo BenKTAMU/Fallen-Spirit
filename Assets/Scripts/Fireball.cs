@@ -24,7 +24,6 @@ public class Fireball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        Debug.Log(other.collider.tag);
         if (other.collider.CompareTag("forcefield"))
         {
             Debug.Log("Deflected");
