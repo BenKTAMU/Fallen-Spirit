@@ -5,6 +5,9 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    public BossController boss;
+    public follow_player player_follower;
+
     [SerializeField] private float moveSpeed = 8f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
@@ -16,7 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
     [SerializeField] private float groundPoundForce = 2f;
-    
+
     [SerializeField] private GameObject respawnPoint;
 
     public GameObject forceField;
@@ -103,7 +106,8 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(StopGroundPounding());
         }
-        else if(collision.gameObject.tag == "fireball"){
+        else if (collision.gameObject.tag == "fireball")
+        {
             Die();
         }
         else if (collision.gameObject.tag == "enemy")
@@ -138,8 +142,18 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Checkpoint reached");
             respawnPoint = other.gameObject;
         }
+        else if (other.gameObject.name == "boss_spawn_point")
+        {
+            boss.SpawnBoss();
+
+            float relativeX = other.bounds.center.x - transform.position.x;
+            bool to_the_left = relativeX < 0f;
+
+            if (to_the_left) player_follower.follow_boss = false;
+            else player_follower.follow_boss = true;
+        }
     }
-    
+
 
     IEnumerator StopGroundPounding()
     {

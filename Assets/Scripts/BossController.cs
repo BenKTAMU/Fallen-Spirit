@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-public class range_check : MonoBehaviour
+public class BossController : MonoBehaviour
 {
     public GameObject player;
     public float min_distance = 3f;
@@ -29,14 +29,17 @@ public class range_check : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (((player.transform.position - gameObject.transform.position).magnitude < min_distance) && !started)
-        {
-            started = true;
-            GetComponent<SpriteRenderer>().enabled = true;
-            GetComponent<Rigidbody2D>().gravityScale = 4;
-            StartCoroutine(ActivateShield());
-            StartCoroutine(DoAttack());
-        }
+    }
+
+    public void SpawnBoss()
+    {
+        if (started) return;
+
+        started = true;
+        GetComponent<SpriteRenderer>().enabled = true;
+        GetComponent<Rigidbody2D>().gravityScale = 4;
+        StartCoroutine(ActivateShield());
+        StartCoroutine(DoAttack());
     }
 
     IEnumerator ActivateShield()
