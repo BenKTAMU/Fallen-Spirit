@@ -9,6 +9,7 @@ TagManager:
   - armor
   - helmet
   - forcefield
+  - enemy
   layers:
   - Default
   - TransparentFX
