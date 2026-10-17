@@ -12,14 +12,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float checkRadius = 0.5f;
-    private Rigidbody2D body;
+    
+    [SerializeField] private float groundAcceleration = 60f;
+    [SerializeField] private float groundDeceleration = 90f;
 
+    [SerializeField] private float airAcceleration = 20f;
+    [SerializeField] private float airDeceleration = 10f;
+
+    [SerializeField] private float airSpeed = 4f;
+
+    [SerializeField] private float maxFallSpeed;
+    
+    private Rigidbody2D body;
+    
 
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
-    [SerializeField] private float groundPoundForce = 2f;
-
+    [SerializeField] private float groundPoundForce = -2f;
+    
     [SerializeField] private GameObject respawnPoint;
 
     public GameObject forceField;
@@ -53,7 +64,23 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        body.linearVelocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, body.linearVelocity.y);
+        
+        float targetSpeed = isGrounded ?  Input.GetAxis("Horizontal") * moveSpeed : Input.GetAxis("Horizontal") * airSpeed;
+        float acceleration;
+        float newXVelocity;
+        if (isGrounded)
+        {
+            acceleration = Mathf.Abs(targetSpeed) > 0.0f ? groundAcceleration : groundDeceleration;
+            newXVelocity = Mathf.MoveTowards(body.linearVelocityX, targetSpeed, acceleration * Time.fixedDeltaTime);
+        }
+        else
+        {
+            acceleration = Mathf.Abs(airSpeed) > 0.0f ? airAcceleration : airDeceleration;
+            newXVelocity = Mathf.MoveTowards(body.linearVelocityX, targetSpeed, acceleration * Time.fixedDeltaTime);
+        }
+        
+        
+        body.linearVelocity = new Vector2(newXVelocity, body.linearVelocity.y);
 
         if (body.linearVelocityY < 0)
         {
@@ -93,10 +120,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer))
-        {
-            isGrounded = true;
-            StartCoroutine(StopGroundPounding());
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+        if (body.linearVelocityY < 0 && !isGroundPounding){
+            body.linearVelocityY = -Math.Min(Math.Abs(body.linearVelocityY), Math.Abs(maxFallSpeed));
         }
     }
 
@@ -106,8 +132,7 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(StopGroundPounding());
         }
-        else if (collision.gameObject.tag == "fireball")
-        {
+        if(collision.gameObject.tag == "fireball"){
             Die();
         }
         else if (collision.gameObject.tag == "enemy")
@@ -152,8 +177,12 @@ public class PlayerController : MonoBehaviour
             if (to_the_left) player_follower.follow_boss = false;
             else player_follower.follow_boss = true;
         }
+        if (other.gameObject.tag == "saw")
+        {
+            Die();
+        }
     }
-
+    
 
     IEnumerator StopGroundPounding()
     {

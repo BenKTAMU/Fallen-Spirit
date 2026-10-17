@@ -12,6 +12,7 @@ TagManager:
   - enemy
   - fireball
   - checkpoint
+  - saw
   layers:
   - Default
   - TransparentFX
