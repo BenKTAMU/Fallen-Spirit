@@ -132,9 +132,11 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(StopGroundPounding());
         }
-        if(collision.gameObject.tag == "fireball"){
+        
+        if(collision.gameObject.tag == "fireball" && !forceField.activeSelf){
             Die();
         }
+        
         else if (collision.gameObject.tag == "enemy")
         {
             bool on_top = false;

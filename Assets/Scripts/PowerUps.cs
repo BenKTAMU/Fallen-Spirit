@@ -24,7 +24,10 @@ public class PowerUps : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (hasHelmet && !helmetLight.activeSelf)
+        {
+            helmetLight.SetActive(true);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)

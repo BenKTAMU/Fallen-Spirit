@@ -8,11 +8,13 @@ public class Fireball : MonoBehaviour
     private Rigidbody2D body;
 
     [SerializeField] private float fireballSpeed;
+
+    public float fireballLifetime = 5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, 15f); 
+        Destroy(gameObject, fireballLifetime); 
     }
 
     // Update is called once per frame
@@ -34,7 +36,7 @@ public class Fireball : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+           // Destroy(gameObject);
         }
         
     }
