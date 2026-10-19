@@ -12,9 +12,12 @@ public class BossController : MonoBehaviour
     public float attack_start_delay = 5f;
     public float attack_cooldown_delay = 5f;
 
+    public float attack1_speed = 0.25f;
+
     public GameObject boss_shield;
 
     public Light2D attack_flash_light;
+    public GameObject attack1;
 
     private bool started = false;
 
@@ -75,10 +78,16 @@ public class BossController : MonoBehaviour
 
     IEnumerator MakeFlash()
     {
+        float x = attack1.transform.position.x;
+        float y = attack1.transform.position.y;
+
+        float direction = -1;
+        if (player.transform.position.x > x) direction = 1;
+
         for (int i = 0; i < 20; i++)
         {
             attack_flash_light.intensity = i * 0.5f;
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.02f);
         }
 
         yield return new WaitForSeconds(0.2f);
@@ -86,7 +95,17 @@ public class BossController : MonoBehaviour
         for (int i = 0; i < 20; i++)
         {
             attack_flash_light.intensity = 10 - i * 0.5f;
+            yield return new WaitForSeconds(0.02f);
+        }
+
+        attack1.SetActive(true);
+        for (int i = 0; i < 30; i++)
+        {
+            attack1.transform.position = new Vector2(x + direction * i * attack1_speed, y);
             yield return new WaitForSeconds(0.05f);
         }
+
+        attack1.SetActive(false);
+        attack1.transform.position = new Vector2(x, attack1.transform.position.y);
     }
 }
