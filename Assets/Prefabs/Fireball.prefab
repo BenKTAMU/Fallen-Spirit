@@ -108,6 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fireball
   fireballSpeed: 5
+  fireballLifetime: 5
 --- !u!50 &8616523834730861543
 Rigidbody2D:
   serializedVersion: 5

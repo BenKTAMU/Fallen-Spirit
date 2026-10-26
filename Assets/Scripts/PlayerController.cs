@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using System.Collections;
+using NUnit.Framework;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float checkRadius = 0.5f;
-    
+
     [SerializeField] private float groundAcceleration = 60f;
     [SerializeField] private float groundDeceleration = 90f;
 
@@ -22,15 +23,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float airSpeed = 4f;
 
     [SerializeField] private float maxFallSpeed;
-    
+
     private Rigidbody2D body;
-    
+
 
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
     [SerializeField] private float lowJumpMultiplier = 2f;
     [SerializeField] private float groundPoundForce = -2f;
-    
+
     [SerializeField] private GameObject respawnPoint;
 
     public GameObject forceField;
@@ -64,8 +65,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        float targetSpeed = isGrounded ?  Input.GetAxis("Horizontal") * moveSpeed : Input.GetAxis("Horizontal") * airSpeed;
+
+        float targetSpeed = isGrounded ? Input.GetAxis("Horizontal") * moveSpeed : Input.GetAxis("Horizontal") * airSpeed;
         float acceleration;
         float newXVelocity;
         if (isGrounded)
@@ -78,8 +79,8 @@ public class PlayerController : MonoBehaviour
             acceleration = Mathf.Abs(airSpeed) > 0.0f ? airAcceleration : airDeceleration;
             newXVelocity = Mathf.MoveTowards(body.linearVelocityX, targetSpeed, acceleration * Time.fixedDeltaTime);
         }
-        
-        
+
+
         body.linearVelocity = new Vector2(newXVelocity, body.linearVelocity.y);
 
         if (body.linearVelocityY < 0)
@@ -120,8 +121,28 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        if (body.linearVelocityY < 0 && !isGroundPounding){
+        Collider2D collision = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+
+        if (collision != null)
+        {
+            Vector2 origin = groundCheck.position;
+            Vector2 collisionPoint = collision.ClosestPoint(origin);
+
+            Vector2 collisionVector = (collisionPoint - origin).normalized;
+
+            if (Vector2.Dot(collisionVector, Vector2.down) > 0.9f) isGrounded = true;
+            else
+            {
+                isGrounded = false;
+            }
+        }
+        else
+        {
+            isGrounded = false;
+        }
+
+        if (body.linearVelocityY < 0 && !isGroundPounding)
+        {
             body.linearVelocityY = -Math.Min(Math.Abs(body.linearVelocityY), Math.Abs(maxFallSpeed));
         }
     }
@@ -132,11 +153,12 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(StopGroundPounding());
         }
-        
-        if(collision.gameObject.tag == "fireball" && !forceField.activeSelf){
+
+        if (collision.gameObject.tag == "fireball" && !forceField.activeSelf)
+        {
             Die();
         }
-        
+
         else if (collision.gameObject.tag == "enemy")
         {
             bool on_top = false;
@@ -153,11 +175,22 @@ public class PlayerController : MonoBehaviour
             if (on_top && isGroundPounding)
             {
                 Debug.Log("Pounded enemy");
-                isGrounded = true;
+                BossController bc = collision.gameObject.GetComponent<BossController>();
+
+                if (bc.boss_shield.activeSelf)
+                {
+                    Die();
+                }
+                else
+                {
+                    bc.Hit();
+                    isGrounded = true;
+                }
+
             }
             else
             {
-                Debug.Log("Game Over (touched enemy)");
+                Die();
             }
         }
     }
@@ -179,12 +212,17 @@ public class PlayerController : MonoBehaviour
             if (to_the_left) player_follower.follow_boss = false;
             else player_follower.follow_boss = true;
         }
+        else if (other.gameObject.name == "attack1")
+        {
+            other.gameObject.SetActive(false);
+            Die();
+        }
         if (other.gameObject.tag == "saw")
         {
             Die();
         }
     }
-    
+
 
     IEnumerator StopGroundPounding()
     {
