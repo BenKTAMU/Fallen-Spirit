@@ -44,11 +44,16 @@ public class PlayerController : MonoBehaviour
     private int playerLayer;
     private int playerShieldedLayer;
 
+    private Animator anim;
+    private SpriteRenderer sr;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerLayer = LayerMask.NameToLayer("Player");
         playerShieldedLayer = LayerMask.NameToLayer("PlayerShielded");
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     public void Die()
@@ -82,6 +87,18 @@ public class PlayerController : MonoBehaviour
 
 
         body.linearVelocity = new Vector2(newXVelocity, body.linearVelocity.y);
+        anim.SetFloat("Speed", Mathf.Abs(newXVelocity));
+        anim.SetBool("IsGrounded", isGrounded);
+        
+
+        if (newXVelocity > 0)
+        {
+            sr.flipX = false;
+        }
+        else
+        {
+            sr.flipX = true;
+        }
 
         if (body.linearVelocityY < 0)
         {
@@ -96,6 +113,8 @@ public class PlayerController : MonoBehaviour
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
         }
+        
+        anim.SetFloat("yVelocity", body.linearVelocityY);
 
         if (Input.GetKeyDown(KeyCode.S) && powerUps.hasBoots && !isGrounded)
         {
