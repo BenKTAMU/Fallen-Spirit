@@ -81,8 +81,8 @@ public class BossController : MonoBehaviour
         {
             GameObject attack2 = Instantiate(attack2_prefab, attack2_launch_point.position, attack2_launch_point.rotation);
 
-            Vector2 to_player = (play)
-            attack2.GetComponent<Rigidbody2D>().linearVelocity
+            Vector2 to_player = (player.transform.position - transform.position).normalized;
+            attack2.GetComponent<Rigidbody2D>().linearVelocity = to_player;
             yield return new WaitForSeconds(1.5f);
         }
     }

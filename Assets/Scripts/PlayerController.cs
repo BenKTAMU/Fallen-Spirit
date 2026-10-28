@@ -24,7 +24,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float maxFallSpeed;
 
+    public AudioClip jump_audio;
+    public AudioClip land_audio;
     private Rigidbody2D body;
+    private AudioSource audio_source;
 
 
     [SerializeField] private float jumpForce = 4f;
@@ -38,6 +41,7 @@ public class PlayerController : MonoBehaviour
 
     public PowerUps powerUps;
 
+    private bool played_land_audio = false;
     private bool isGrounded = true;
     public bool isGroundPounding = false;
 
@@ -54,6 +58,7 @@ public class PlayerController : MonoBehaviour
         playerShieldedLayer = LayerMask.NameToLayer("PlayerShielded");
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        audio_source = GetComponent<AudioSource>();
     }
 
     public void Die()
@@ -112,6 +117,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
+            audio_source.PlayOneShot(jump_audio);
         }
         
         anim.SetFloat("yVelocity", body.linearVelocityY);
@@ -149,15 +155,24 @@ public class PlayerController : MonoBehaviour
 
             Vector2 collisionVector = (collisionPoint - origin).normalized;
 
-            if (Vector2.Dot(collisionVector, Vector2.down) > 0.9f) isGrounded = true;
+            if (Vector2.Dot(collisionVector, Vector2.down) > 0.9f) {
+                isGrounded = true;
+                if (!played_land_audio)
+                {
+                    played_land_audio = true;
+                    audio_source.PlayOneShot(land_audio);
+                }
+            }
             else
             {
                 isGrounded = false;
+                played_land_audio = false;
             }
         }
         else
         {
             isGrounded = false;
+            played_land_audio = false;
         }
 
         if (body.linearVelocityY < 0 && !isGroundPounding)
@@ -204,6 +219,10 @@ public class PlayerController : MonoBehaviour
                 {
                     bc.Hit();
                     isGrounded = true;
+                    if (!played_land_audio) {
+                        audio_source.PlayOneShot(land_audio);
+                        played_land_audio = true;
+                    }
                 }
 
             }

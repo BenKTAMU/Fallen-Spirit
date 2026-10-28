@@ -9,10 +9,14 @@ public class FireballLauncher : MonoBehaviour
     public float fireRate = 1.5f;
 
     public float nextFireTime = 0f;
-    
+
+    public AudioClip fireball_soundeffect;
+    AudioSource audio_source;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        audio_source = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -28,5 +32,6 @@ public class FireballLauncher : MonoBehaviour
     void Shoot()
     {
         Instantiate(fireballPrefab, firePoint.position, firePoint.rotation);
+        audio_source.PlayOneShot(fireball_soundeffect);
     }
 }
