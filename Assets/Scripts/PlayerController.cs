@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     public PowerUps powerUps;
 
     private bool played_land_audio = false;
-    private bool isGrounded = true;
+    [SerializeField] private bool isGrounded = true;
     public bool isGroundPounding = false;
 
     private int playerLayer;
@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
         body.linearVelocity = new Vector2(newXVelocity, body.linearVelocity.y);
         anim.SetFloat("Speed", Mathf.Abs(newXVelocity));
         anim.SetBool("IsGrounded", isGrounded);
+        anim.SetBool("IsGroundPounding", isGroundPounding);
         
 
         if (newXVelocity > 0)
@@ -183,7 +184,7 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "ground" && isGroundPounding)
+        if (collision.gameObject.tag == "ground" && isGroundPounding && body.linearVelocityY <= 0)
         {
             StartCoroutine(StopGroundPounding());
         }

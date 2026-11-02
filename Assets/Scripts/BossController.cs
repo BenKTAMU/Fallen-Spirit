@@ -50,7 +50,7 @@ public class BossController : MonoBehaviour
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Rigidbody2D>().gravityScale = 4;
         StartCoroutine(ActivateShield());
-        StartCoroutine(DoAttack1());
+        StartCoroutine(DoAttack2());
     }
 
     public void Hit()
