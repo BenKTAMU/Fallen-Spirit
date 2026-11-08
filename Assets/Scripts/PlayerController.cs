@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour
     private Transform wallCheck;
     private float wallCheckDistance = 0.2f;
 
+    public float shieldDuaration = 0.5f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -67,6 +69,7 @@ public class PlayerController : MonoBehaviour
     public void Die()
     {
         Debug.Log("Game Over");
+        player_follower.follow_boss = false;
         transform.position = respawnPoint.transform.position;
     }
 
@@ -190,7 +193,17 @@ public class PlayerController : MonoBehaviour
             Die();
         }
 
-        else if (collision.gameObject.tag == "enemy")
+        if(collision.gameObject.tag == "Attack" && !forceField.activeSelf)
+        {
+            Die();
+        }
+
+        if(collision.gameObject.tag == "enemy")
+        {
+            Debug.Log("Hit Enemy");
+        }
+
+        if (collision.gameObject.tag == "enemy" && collision.gameObject.GetComponentInParent<BossController>().shield_active == false)
         {
             bool on_top = false;
 
@@ -203,24 +216,27 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (on_top && isGroundPounding)
+            if (isGroundPounding)
             {
+                body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce * 3f);
                 Debug.Log("Pounded enemy");
                 BossController bc = collision.gameObject.GetComponent<BossController>();
+                StartCoroutine(StopGroundPounding());
+                bc.Hit();
 
-                if (bc.boss_shield.activeSelf)
-                {
-                    Die();
-                }
-                else
-                {
-                    bc.Hit();
-                    isGrounded = true;
-                    if (!played_land_audio) {
-                        audio_source.PlayOneShot(land_audio);
-                        played_land_audio = true;
-                    }
-                }
+                // if (bc.boss_shield.activeSelf)
+                // {
+                //     Die();
+                // }
+                // else
+                // {
+                //     bc.Hit();
+                //     isGrounded = true;
+                //     if (!played_land_audio) {
+                //         audio_source.PlayOneShot(land_audio);
+                //         played_land_audio = true;
+                //     }
+                // }
 
             }
             else
@@ -284,7 +300,7 @@ public class PlayerController : MonoBehaviour
     {
         gameObject.layer = playerShieldedLayer;
         forceField.SetActive(true);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(shieldDuaration);
         gameObject.layer = playerLayer;
         forceField.SetActive(false);
     }

@@ -9,7 +9,7 @@ public class BossController : MonoBehaviour
     public float min_distance = 3f;
     public float shield_activate_delay = 1f;
     public float shield_poweron_delay = 0.1f;
-    public float attack_start_delay = 5f;
+    public float attack_start_delay = 2f;
     public float attack_cooldown_delay = 3f;
 
     public int num_phase_1_attacks = 5;
@@ -20,14 +20,18 @@ public class BossController : MonoBehaviour
     public float attack1_speed = 1f;
 
     public GameObject boss_shield;
+    public bool shield_active = false;
 
     public Light2D attack_flash_light;
     public GameObject attack1;
+    public GameObject attack1_prefab;
 
     public Transform attack2_launch_point;
     public GameObject attack2_prefab;
 
     private bool started = false;
+
+    private Coroutine attack1Coroutine;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -50,7 +54,7 @@ public class BossController : MonoBehaviour
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Rigidbody2D>().gravityScale = 4;
         StartCoroutine(ActivateShield());
-        StartCoroutine(DoAttack2());
+        attack1Coroutine = StartCoroutine(DoAttack1());
     }
 
     public void Hit()
@@ -58,8 +62,18 @@ public class BossController : MonoBehaviour
         has_been_hit = true;
         StartCoroutine(ActivateShield());
         attack_phase++;
+        if (attack_phase == 1) StartCoroutine(DoAttack2(5));
+    }
 
-        if (attack_phase == 1) StartCoroutine(DoAttack2());
+    public void ShieldHit()
+    {
+        Debug.Log("Shield Hit");
+        StartCoroutine(DeactivateShield());
+        if(attack_phase == 0)
+        {
+            StopCoroutine(attack1Coroutine);
+            attack1Coroutine = null;
+        }
     }
 
     IEnumerator ActivateShield()
@@ -73,10 +87,24 @@ public class BossController : MonoBehaviour
             boss_shield.transform.localScale = new Vector2(0.1f * i, 0.1f * i);
             yield return new WaitForSeconds(shield_poweron_delay);
         }
+        shield_active = true;
     }
 
-    IEnumerator DoAttack2()
+    IEnumerator DeactivateShield()
     {
+        for (int i = 11; i >= 0; i--) // scale to 1.1
+        {
+            boss_shield.transform.localScale = new Vector2(0.1f * i, 0.1f * i);
+            yield return new WaitForSeconds(shield_poweron_delay);
+        }
+
+        boss_shield.SetActive(false);
+        shield_active = false;
+    }
+
+    IEnumerator DoAttack2(float delay_increase = 0f)
+    {
+        yield return new WaitForSeconds(attack_start_delay + delay_increase);
         for (int i = 0; i < 10; i++)
         {
             GameObject attack2 = Instantiate(attack2_prefab, attack2_launch_point.position, attack2_launch_point.rotation);
@@ -93,17 +121,17 @@ public class BossController : MonoBehaviour
 
         for (int i = 0; i < num_phase_1_attacks; i++)
         {
-            LaunchAttack1(i == (num_phase_1_attacks - 1));
+            GameObject attack1 = Instantiate(attack1_prefab, attack2_launch_point.position, attack2_launch_point.rotation);
+            attack1.GetComponent<Rigidbody2D>().linearVelocity = Vector2.left * attack1_speed;
             yield return new WaitForSeconds(attack_cooldown_delay);
         }
-
-        boss_shield.SetActive(false);
     }
 
     void LaunchAttack1(bool deactivate_shield)
     {
         Debug.Log("Boss attack");
         StartCoroutine(MakeFlash(deactivate_shield));
+        DoAttack1();
     }
 
     IEnumerator MakeFlash(bool deactivate_shield)
@@ -125,22 +153,16 @@ public class BossController : MonoBehaviour
             yield return new WaitForSeconds(0.02f);
         }
 
-        attack1.transform.position = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 2);
-        attack1.SetActive(true);
-        Vector2 velocity = attack1_speed * (player.transform.position - attack1.transform.position).normalized;
-        attack1.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(velocity.x, Math.Max(0, velocity.y));
+        // attack1.transform.position = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y - 2);
+        // attack1.SetActive(true);
+        // Vector2 velocity = attack1_speed * (player.transform.position - attack1.transform.position).normalized;
+        // attack1.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(velocity.x, Math.Max(0, velocity.y));
 
         yield return new WaitForSeconds(2f);
 
-        attack1.SetActive(false);
-        attack1.transform.position = new Vector2(x, attack1.transform.position.y);
+        // attack1.SetActive(false);
+        // attack1.transform.position = new Vector2(x, attack1.transform.position.y);
 
-        if (deactivate_shield)
-        {
-            boss_shield.SetActive(false);
-            Debug.Log("Relaunching attack in 5 sec");
-            StartCoroutine(RelaunchAttack1());
-        }
     }
 
     IEnumerator RelaunchAttack1()

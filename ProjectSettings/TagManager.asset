@@ -13,6 +13,7 @@ TagManager:
   - fireball
   - checkpoint
   - saw
+  - Attack
   layers:
   - Default
   - TransparentFX
@@ -23,7 +24,7 @@ TagManager:
   - PlayerShielded
   - Player
   - Fireball
-  - 
+  - Boss
   - 
   - 
   - 
