@@ -51,6 +51,9 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private SpriteRenderer sr;
 
+    private Transform wallCheck;
+    private float wallCheckDistance = 0.2f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -75,8 +78,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        if (!isGrounded && isTouchingWall(horizontalInput))
+        {
+            horizontalInput = 0f;
+        }
 
-        float targetSpeed = isGrounded ? Input.GetAxis("Horizontal") * moveSpeed : Input.GetAxis("Horizontal") * airSpeed;
+        float targetSpeed = isGrounded ? horizontalInput * moveSpeed : horizontalInput * airSpeed;
         float acceleration;
         float newXVelocity;
         if (isGrounded)
@@ -119,6 +127,7 @@ public class PlayerController : MonoBehaviour
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
             audio_source.PlayOneShot(jump_audio);
+            isGrounded = false;
         }
         
         anim.SetFloat("yVelocity", body.linearVelocityY);
@@ -131,15 +140,17 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && powerUps.hasArmor)
         {
-            gameObject.layer = playerShieldedLayer;
-            forceField.SetActive(true);
+            // gameObject.layer = playerShieldedLayer;
+            // forceField.SetActive(true);
+            StartCoroutine(CastShield());
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            gameObject.layer = playerLayer;
-            forceField.SetActive(false);
+            // gameObject.layer = playerLayer;
+            // forceField.SetActive(false);
         }
+
 
 
 
@@ -147,38 +158,23 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Collider2D collision = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-
-        if (collision != null)
+        bool groundedNow = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+        if (groundedNow)
         {
-            Vector2 origin = groundCheck.position;
-            Vector2 collisionPoint = collision.ClosestPoint(origin);
-
-            Vector2 collisionVector = (collisionPoint - origin).normalized;
-
-            if (Vector2.Dot(collisionVector, Vector2.down) > 0.9f) {
-                isGrounded = true;
-                if (!played_land_audio)
+            if(!isGrounded && !played_land_audio && body.linearVelocityY <= 0.1f)
+            {
+                played_land_audio = true;
+                if (land_audio != null & audio_source != null)
                 {
-                    played_land_audio = true;
                     audio_source.PlayOneShot(land_audio);
                 }
-            }
-            else
-            {
-                isGrounded = false;
-                played_land_audio = false;
+                isGrounded = true;
             }
         }
         else
         {
             isGrounded = false;
             played_land_audio = false;
-        }
-
-        if (body.linearVelocityY < 0 && !isGroundPounding)
-        {
-            body.linearVelocityY = -Math.Min(Math.Abs(body.linearVelocityY), Math.Abs(maxFallSpeed));
         }
     }
 
@@ -262,10 +258,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private bool isTouchingWall(float direction)
+    {
+        if (Mathf.Abs(direction) < 0.01f)
+        {
+            return false;
+        }
+
+        Vector2 rayDirection;
+        if (direction > 0)
+        {
+            rayDirection = Vector2.right;
+        }
+        else
+        {
+            rayDirection = Vector2.left;
+        }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, rayDirection, wallCheckDistance, groundLayer);
+        return hit.collider != null;
+    }
+
+
+    IEnumerator CastShield()
+    {
+        gameObject.layer = playerShieldedLayer;
+        forceField.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        gameObject.layer = playerLayer;
+        forceField.SetActive(false);
+    }
+
 
     IEnumerator StopGroundPounding()
     {
         yield return new WaitForSeconds(0.5f);
         isGroundPounding = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+        }
     }
 }

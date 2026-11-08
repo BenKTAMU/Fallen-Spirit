@@ -110,8 +110,9 @@ MonoBehaviour:
   firePoint: {fileID: 977825625923913262}
   fireRate: 1.5
   nextFireTime: 0
+  fireballLifetime: 5
   fireball_soundeffect: {fileID: 8300000, guid: 7248e1c61c4392940aa8655552dc5391, type: 3}
-  audio_source: {fileID: 0}
+  fireballScriptPrefab: {fileID: 7028094794446471806, guid: c20e18df3ffef7346bb605c36cb837db, type: 3}
 --- !u!82 &6075827914667487814
 AudioSource:
   m_ObjectHideFlags: 0

@@ -20,6 +20,7 @@ public class trapdoor_control : MonoBehaviour
     {
         if (isOnTrapdoor && (playerController.isGroundPounding))
         {
+            Debug.Log("Trapdoor Deactivated");
             gameObject.SetActive(false);
         }
     }
@@ -32,6 +33,8 @@ public class trapdoor_control : MonoBehaviour
         {
             if (Vector2.Dot(contact.normal, Vector2.down) > 0.9f)
             {
+                
+                Debug.Log("isOnTrapdoor");
                 isOnTrapdoor = true;
             }
         }
@@ -41,6 +44,7 @@ public class trapdoor_control : MonoBehaviour
     {
         if (collision.collider == player)
         {
+            Debug.Log("is not OnTrapdoor");
             isOnTrapdoor = false;
         }
     }

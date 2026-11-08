@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class FireballLauncher : MonoBehaviour
@@ -10,9 +11,12 @@ public class FireballLauncher : MonoBehaviour
 
     public float nextFireTime = 0f;
 
+    public float fireballLifetime = 5f;
+
     public AudioClip fireball_soundeffect;
     AudioSource audio_source;
 
+    [SerializeField] private GameObject toDestroy;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -31,7 +35,14 @@ public class FireballLauncher : MonoBehaviour
 
     void Shoot()
     {
-        Instantiate(fireballPrefab, firePoint.position, firePoint.rotation);
+        toDestroy = Instantiate(fireballPrefab, firePoint.position, firePoint.rotation);
+        StartCoroutine(DestroyFireball(toDestroy));
         audio_source.PlayOneShot(fireball_soundeffect);
+    }
+
+    IEnumerator DestroyFireball(GameObject toEliminate)
+    {
+        yield return new WaitForSeconds(fireballLifetime);
+        Destroy(toEliminate);
     }
 }
