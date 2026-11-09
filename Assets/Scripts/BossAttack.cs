@@ -34,7 +34,7 @@ public class BossAttack : MonoBehaviour
             Vector2 newDir = -transform.right;
             transform.right = newDir;
             transform.position += (UnityEngine.Vector3)(newDir * 0.10f);
-            body.linearVelocity = newDir * body.linearVelocity.magnitude * 1.5f;
+            body.linearVelocity = newDir * body.linearVelocity.magnitude * 3f;
             attackCollider.excludeLayers = LayerMask.GetMask("PlayerShielded", "Player");
             sr.color = new Color(0.5f, 0f, 0.5f);
             attackLight.enabled = true;

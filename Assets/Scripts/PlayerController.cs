@@ -218,7 +218,7 @@ public class PlayerController : MonoBehaviour
 
             if (isGroundPounding)
             {
-                body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce * 3f);
+                body.linearVelocity = new Vector2(body.linearVelocity.x + (jumpForce * 0.5f), jumpForce * 3f);
                 Debug.Log("Pounded enemy");
                 BossController bc = collision.gameObject.GetComponent<BossController>();
                 StartCoroutine(StopGroundPounding());

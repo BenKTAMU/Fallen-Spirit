@@ -32,6 +32,19 @@ public class BossController : MonoBehaviour
     private bool started = false;
 
     private Coroutine attack1Coroutine;
+    private bool doingAttack1 = false;
+
+    private Coroutine attack2Coroutine;
+    private bool doingAttack2 = false;
+
+
+    //BOSS ATTACK 2
+
+    public Transform spawnPoint1;
+    public Transform spawnPoint2;
+    public Transform spawnPoint3;
+
+    public float attack2_cooldown_delay = 1f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,8 +55,17 @@ public class BossController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
+        if(attack_phase == 0 && !doingAttack1 && shield_active)
+        {
+            attack1Coroutine = StartCoroutine(DoAttack1());
+        }
+        else if(attack_phase == 1 && !doingAttack2 && shield_active)
+        {
+            attack2Coroutine = StartCoroutine(DoAttack2());
+        }
+
     }
 
     public void SpawnBoss()
@@ -62,17 +84,25 @@ public class BossController : MonoBehaviour
         has_been_hit = true;
         StartCoroutine(ActivateShield());
         attack_phase++;
-        if (attack_phase == 1) StartCoroutine(DoAttack2(5));
+        if (attack_phase == 1) attack2Coroutine = StartCoroutine(DoAttack2(1f));
     }
 
     public void ShieldHit()
     {
         Debug.Log("Shield Hit");
+        shield_active = false;
         StartCoroutine(DeactivateShield());
         if(attack_phase == 0)
         {
             StopCoroutine(attack1Coroutine);
             attack1Coroutine = null;
+            doingAttack1 = false;
+        }
+        else if(attack_phase == 1)
+        {
+            StopCoroutine(attack2Coroutine);
+            attack2Coroutine = null;
+            doingAttack2 = false;
         }
     }
 
@@ -99,24 +129,47 @@ public class BossController : MonoBehaviour
         }
 
         boss_shield.SetActive(false);
-        shield_active = false;
+        
     }
 
     IEnumerator DoAttack2(float delay_increase = 0f)
     {
-        yield return new WaitForSeconds(attack_start_delay + delay_increase);
-        for (int i = 0; i < 10; i++)
-        {
-            GameObject attack2 = Instantiate(attack2_prefab, attack2_launch_point.position, attack2_launch_point.rotation);
 
-            Vector2 to_player = (player.transform.position - transform.position).normalized;
-            attack2.GetComponent<Rigidbody2D>().linearVelocity = to_player;
-            yield return new WaitForSeconds(1.5f);
-        }
+        doingAttack2 = true;
+
+        yield return new WaitForSeconds(attack_start_delay + delay_increase);
+
+        GameObject attack2 = Instantiate(attack2_prefab, spawnPoint1.position, spawnPoint1.rotation);
+        
+        yield return new WaitForSeconds(attack2_cooldown_delay);
+
+        GameObject attack2_2 = Instantiate(attack2_prefab, spawnPoint2.position, spawnPoint2.rotation);
+        GameObject attack2_3 = Instantiate(attack2_prefab, spawnPoint1.position, spawnPoint3.rotation);
+
+        yield return new WaitForSeconds(attack2_cooldown_delay);
+
+        GameObject attack2_4 = Instantiate(attack2_prefab, spawnPoint3.position, spawnPoint3.rotation);
+        GameObject attack2_5 = Instantiate(attack2_prefab, spawnPoint2.position, spawnPoint2.rotation);
+
+        yield return new WaitForSeconds(attack2_cooldown_delay);
+
+        //6767676767676767
+        GameObject attack2_6 = Instantiate(attack2_prefab, spawnPoint1.position, spawnPoint1.rotation);
+        GameObject attack2_7 = Instantiate(attack2_prefab, spawnPoint2.position, spawnPoint2.rotation);
+
+        yield return new WaitForSeconds(attack2_cooldown_delay);
+
+        GameObject attack1_2 = Instantiate(attack1_prefab, attack2_launch_point.position, attack2_launch_point.rotation);
+        attack1_2.GetComponent<Rigidbody2D>().linearVelocity = Vector2.left * attack1_speed * 0.3f;
+
+        doingAttack2 = false;
+
     }
 
     IEnumerator DoAttack1()
     {
+
+        doingAttack1 = true;
         yield return new WaitForSeconds(attack_start_delay);
 
         for (int i = 0; i < num_phase_1_attacks; i++)
@@ -125,6 +178,8 @@ public class BossController : MonoBehaviour
             attack1.GetComponent<Rigidbody2D>().linearVelocity = Vector2.left * attack1_speed;
             yield return new WaitForSeconds(attack_cooldown_delay);
         }
+
+        doingAttack1 = false;
     }
 
     void LaunchAttack1(bool deactivate_shield)
