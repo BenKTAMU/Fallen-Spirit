@@ -24,11 +24,15 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float maxFallSpeed;
 
+    public AudioClip item_pickup_audio;
     public AudioClip jump_audio;
     public AudioClip land_audio;
+    public AudioClip shield_up_audio;
+    public AudioClip walking_audio;
     private Rigidbody2D body;
     private AudioSource audio_source;
-
+    public AudioSource shield_audio_source;
+    private BoxCollider2D playerCollider;
 
     [SerializeField] private float jumpForce = 4f;
     [SerializeField] private float fallMultiplier = 2.5f;
@@ -59,6 +63,7 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        playerCollider = GetComponent<BoxCollider2D>();
         playerLayer = LayerMask.NameToLayer("Player");
         playerShieldedLayer = LayerMask.NameToLayer("PlayerShielded");
         anim = GetComponent<Animator>();
@@ -68,6 +73,7 @@ public class PlayerController : MonoBehaviour
 
     public void Die()
     {
+        GameObject.Find("Main Camera").GetComponent<BackgroundAudioPlayer>().PlayDieSound();
         Debug.Log("Game Over");
         player_follower.follow_boss = false;
         transform.position = respawnPoint.transform.position;
@@ -92,6 +98,18 @@ public class PlayerController : MonoBehaviour
         float newXVelocity;
         if (isGrounded)
         {
+            if (Math.Abs(horizontalInput) > 0.1f)
+            {
+                if (!audio_source.isPlaying)
+                {
+                    audio_source.PlayOneShot(walking_audio);
+                }
+            }
+            else
+            {
+                audio_source.Stop();
+            }
+            played_land_audio = false;
             acceleration = Mathf.Abs(targetSpeed) > 0.0f ? groundAcceleration : groundDeceleration;
             newXVelocity = Mathf.MoveTowards(body.linearVelocityX, targetSpeed, acceleration * Time.fixedDeltaTime);
         }
@@ -106,7 +124,20 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("Speed", Mathf.Abs(newXVelocity));
         anim.SetBool("IsGrounded", isGrounded);
         anim.SetBool("IsGroundPounding", isGroundPounding);
-        
+
+        Vector2 origin = new Vector2(
+            playerCollider.bounds.center.x,
+            playerCollider.bounds.min.y
+        );
+
+        float distance_to_ground = 2.0f;
+        RaycastHit2D hit = Physics2D.Raycast(
+            origin, Vector2.down,
+            distance_to_ground,
+            groundLayer
+        );
+
+        bool near_ground = hit.collider != null;
 
         if (newXVelocity > 0)
         {
@@ -129,11 +160,21 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
+            audio_source.Stop();
             audio_source.PlayOneShot(jump_audio);
             isGrounded = false;
         }
-        
-        anim.SetFloat("yVelocity", body.linearVelocityY);
+
+        if (near_ground && body.linearVelocityY < 0)
+        {
+            if (!played_land_audio)
+            {
+                played_land_audio = true;
+                audio_source.PlayOneShot(land_audio);
+            }
+            anim.SetFloat("yVelocity", 0);
+        }
+        else anim.SetFloat("yVelocity", body.linearVelocityY);
 
         if (Input.GetKeyDown(KeyCode.S) && powerUps.hasBoots && !isGrounded)
         {
@@ -164,20 +205,14 @@ public class PlayerController : MonoBehaviour
         bool groundedNow = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
         if (groundedNow)
         {
-            if(!isGrounded && !played_land_audio && body.linearVelocityY <= 0.1f)
+            if (!isGrounded && body.linearVelocityY <= 0.1f)
             {
-                played_land_audio = true;
-                if (land_audio != null & audio_source != null)
-                {
-                    audio_source.PlayOneShot(land_audio);
-                }
                 isGrounded = true;
             }
         }
         else
         {
             isGrounded = false;
-            played_land_audio = false;
         }
     }
 
@@ -193,12 +228,12 @@ public class PlayerController : MonoBehaviour
             Die();
         }
 
-        if(collision.gameObject.tag == "Attack" && !forceField.activeSelf)
+        if (collision.gameObject.tag == "Attack" && !forceField.activeSelf)
         {
             Die();
         }
 
-        if(collision.gameObject.tag == "enemy")
+        if (collision.gameObject.tag == "enemy")
         {
             Debug.Log("Hit Enemy");
         }
@@ -300,6 +335,8 @@ public class PlayerController : MonoBehaviour
     {
         gameObject.layer = playerShieldedLayer;
         forceField.SetActive(true);
+        shield_audio_source.PlayOneShot(shield_up_audio);
+
         yield return new WaitForSeconds(shieldDuaration);
         gameObject.layer = playerLayer;
         forceField.SetActive(false);

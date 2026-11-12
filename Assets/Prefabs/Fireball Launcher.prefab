@@ -112,7 +112,7 @@ MonoBehaviour:
   nextFireTime: 0
   fireballLifetime: 5
   fireball_soundeffect: {fileID: 8300000, guid: 7248e1c61c4392940aa8655552dc5391, type: 3}
-  fireballScriptPrefab: {fileID: 7028094794446471806, guid: c20e18df3ffef7346bb605c36cb837db, type: 3}
+  toDestroy: {fileID: 0}
 --- !u!82 &6075827914667487814
 AudioSource:
   m_ObjectHideFlags: 0
@@ -126,7 +126,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -135,9 +135,9 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 30
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -170,7 +170,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

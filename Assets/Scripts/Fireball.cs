@@ -9,19 +9,23 @@ public class Fireball : MonoBehaviour
 
     [SerializeField] private float fireballSpeed;
 
+    private AudioSource audio_source;
+    public AudioClip deflect_clip;
+
     public float fireballLifetime = 5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, fireballLifetime); 
+        Destroy(gameObject, fireballLifetime);
+        audio_source = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
         body.linearVelocity = transform.right * fireballSpeed;
-        
+
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -29,6 +33,7 @@ public class Fireball : MonoBehaviour
         if (other.collider.CompareTag("forcefield"))
         {
             Debug.Log("Deflected");
+            audio_source.PlayOneShot(deflect_clip);
             Vector2 newDir = -transform.right;
             transform.right = newDir;
             transform.position += (UnityEngine.Vector3)(newDir * 0.10f);
@@ -38,6 +43,6 @@ public class Fireball : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
+
     }
 }

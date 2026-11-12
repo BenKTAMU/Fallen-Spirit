@@ -14,6 +14,9 @@ public class PowerUps : MonoBehaviour
 
     public GameObject helmet;
 
+    public AudioSource PickupItemPlayer;
+    public AudioClip PickupItem;
+
     public GameObject helmetLight;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,17 +39,20 @@ public class PowerUps : MonoBehaviour
         {
             hasBoots = true;
             boots.SetActive(false);
+            PickupItemPlayer.PlayOneShot(PickupItem);
         }
         else if (collision.gameObject.CompareTag("armor"))
         {
             hasArmor = true;
             armor.SetActive(false);
+            PickupItemPlayer.PlayOneShot(PickupItem);
         }
         else if (collision.gameObject.CompareTag("helmet"))
         {
             hasHelmet = true;
             helmetLight.SetActive(true);
             helmet.SetActive(false);
+            PickupItemPlayer.PlayOneShot(PickupItem);
         }
     }
 }
