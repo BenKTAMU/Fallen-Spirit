@@ -7,12 +7,14 @@ public class trapdoor_control : MonoBehaviour
     public Collider2D player;
 
     public PlayerController playerController;
-    
+
+    private AudioSource audio_source;
+    public AudioClip ground_break;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        audio_source = playerController.gameObject.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -22,6 +24,8 @@ public class trapdoor_control : MonoBehaviour
         {
             Debug.Log("Trapdoor Deactivated");
             gameObject.SetActive(false);
+            audio_source.PlayOneShot(ground_break);
+            Debug.Log("Play ground break");
         }
     }
 
@@ -33,7 +37,7 @@ public class trapdoor_control : MonoBehaviour
         {
             if (Vector2.Dot(contact.normal, Vector2.down) > 0.9f)
             {
-                
+
                 Debug.Log("isOnTrapdoor");
                 isOnTrapdoor = true;
             }

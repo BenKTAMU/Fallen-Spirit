@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip land_audio;
     public AudioClip shield_up_audio;
     public AudioClip walking_audio;
+    public AudioClip ground_pound;
     private Rigidbody2D body;
     private AudioSource audio_source;
     public AudioSource shield_audio_source;
@@ -170,7 +171,7 @@ public class PlayerController : MonoBehaviour
             if (!played_land_audio)
             {
                 played_land_audio = true;
-                audio_source.PlayOneShot(land_audio);
+                audio_source.PlayOneShot(isGroundPounding ? ground_pound : land_audio);
             }
             anim.SetFloat("yVelocity", 0);
         }
